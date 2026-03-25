@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPK Server Manager</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <style>
+	/* Ultra Dark Background */
+	body { background-color: #020617; color: #f8fafc; font-family: 'Inter', 'Segoe UI', sans-serif; }
+
+	/* Deep Black Card */
+	.card { background-color: #0f172a; border: 1px solid #1e293b; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+
+	/* Header with subtle border */
+	.card-header { background-color: #1e293b !important; border-bottom: 2px solid #334155; color: #f8fafc !important; font-weight: 700; }
+
+	/* List items - Black to Dark Grey hover */
+	.list-group-item { background-color: #0f172a; border-color: #1e293b; color: #94a3b8; transition: all 0.15s ease; }
+	.list-group-item:hover { background-color: #1e293b; color: #38bdf8; border-left: 4px solid #38bdf8; padding-left: 20px; }
+
+	/* Breadcrumb - Minimalist Dark */
+	.breadcrumb { background-color: #020617; border: 1px solid #1e293b; }
+	.breadcrumb-item a { color: #38bdf8; text-weight: 600; text-decoration: none; }
+	.breadcrumb-item.active { color: #64748b; }
+	.breadcrumb-item + .breadcrumb-item::before { color: #334155; content: "/"; }
+
+	/* Action Button - High Contrast Neon */
+	.btn-success { background-color: #059669; border: none; font-weight: 800; text-transform: uppercase; padding: 15px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); }
+	.btn-success:hover { background-color: #10b981; transform: translateY(-2px); box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+
+	/* Custom scrollbar for that pro look */
+	::-webkit-scrollbar { width: 8px; }
+	::-webkit-scrollbar-track { background: #020617; }
+	::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+    </style>
+
+</head>
+<script>
+function serveFolder(btn, path) {
+    console.log("Sending path to server:", path);
+    const stopBtn = document.getElementById('stop-btn');
+
+    // 1. Reset all 'serve' buttons
+    document.querySelectorAll('.serve-btn').forEach(b => {
+        b.innerText = 'serve';
+        b.className = 'btn btn-sm btn-outline-success serve-btn px-3';
+    });
+
+    // 2. Set THIS button to 'serving'
+    btn.innerText = 'serving';
+    btn.className = 'btn btn-sm btn-warning serve-btn px-3 fw-bold';
+
+    // 3. ACTIVATE the Stop button
+    stopBtn.disabled = false;
+    stopBtn.className = 'btn btn-lg btn-danger fw-bold';
+
+    // 4. Send background request to Flask
+    fetch('/select', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'path=' + encodeURIComponent(path)
+    });
+}
+
+function stopServing(stopBtn) {
+    // 1. Reset all folder buttons back to 'serve'
+    document.querySelectorAll('.serve-btn').forEach(b => {
+        b.innerText = 'serve';
+        b.className = 'btn btn-sm btn-outline-success serve-btn px-3';
+    });
+
+    // 2. Disable and gray out the Stop button
+    stopBtn.disabled = true;
+    stopBtn.innerText = 'STOP SERVING';
+    stopBtn.className = 'btn btn-lg btn-outline-secondary';
+
+    // 3. Tell Flask to kill the process (we'll add this route next)
+    fetch('/stop', { method: 'POST' });
+}
+</script>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Select Folder to Serve</h5>
+                        <small class="badge bg-light text-primary">Ipk Server v1.0</small>
+                    </div>
+                    <div class="card-body">
+                        <!-- Folder List -->
+			<div class="list-group mb-4">
+			    <!-- Individual Folder Items -->
+			    {% for folder in folders %}
+			    <div class="list-group-item list-group-item-action folder-item d-flex justify-content-between align-items-center">
+				<a href="{{ url_for('index', path=(rel_path + '/' + folder).strip('/')) }}"
+				   class="text-decoration-none text-reset flex-grow-1">
+				    <span class="me-2">📁</span> {{ folder }}
+				</a>
+
+				<!-- Changed to a button with an onclick event -->
+				<button type="button"
+					class="btn btn-sm btn-outline-success serve-btn px-3"
+					onclick="serveFolder(this, '{{ (current_path + "/" + folder).replace("//", "/") }}')"
+				    serve
+				</button>
+			    </div>
+			    {% endfor %}
+			    <div class="d-grid mt-4">
+				<button id="stop-btn" type="button" class="btn btn-lg btn-outline-secondary" disabled onclick="stopServing(this)">
+				    ⏹ STOP SERVING
+				</button>
+			    </div>
+			</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://jsdelivr.net"></script>
+</body>
+</html>
+

@@ -1,0 +1,19 @@
+# Python environment
+venv/
+__pycache__/
+*.pyc
+
+# Local State & Logs (Unique to this machine)
+serving.txt
+worker.log
+error.log
+server_error.log
+ipk_server.pid
+
+# OS generated files
+.DS_Store
+.directory
+
+# Your actual IPK data (usually managed separately)
+ipk-dirs/
+
