@@ -1,4 +1,5 @@
 # IPK Manager Dashboard
+<img width="60%" alt="Screenshot 2026-03-25 012533" src="https://github.com/user-attachments/assets/00a592b4-c212-4953-87cf-02f5f44999c0" />
 
 A lightweight, persistent web interface for managing and serving IPK files across a local subnet on Ubuntu 20.04.
 
