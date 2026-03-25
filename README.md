@@ -1,7 +1,7 @@
-# IPK Manager Dashboard
+# IPK Manager Dashboard for Yocto.
 <img width="60%" alt="Screenshot 2026-03-25 012533" src="https://github.com/user-attachments/assets/00a592b4-c212-4953-87cf-02f5f44999c0" />
 
-A lightweight, persistent web interface for managing and serving IPK files across a local subnet on Ubuntu 20.04.
+A dynamic repository management tool for serving Yocto-generated IPK packages, enabling seamless transitions between project-specific build directories across a local subn
 
 ### 🏗 Architecture
 This application uses a **Dual-Service Architecture** to ensure the control panel stays responsive while the file server remains independent.
@@ -71,7 +71,15 @@ sudo systemctl daemon-reload
 sudo systemctl enable flaskapp
 sudo systemctl start flaskapp
 ```
-
+5. Adding and ipk-folders:
+```bash
+mkdir ipk-dirs/your-ipk-directory
+```
+Edit your Yocto **vim conf/local.conf** to ensure you build puts ipks into that folder.
+Using absolute paths is recommended.
+```local.conf
+DEPLOY_DIR_IPK = "~/server-apps/ipk-dirs/var-som-wifi"
+```
 🛠 Management Commands
 * **Check UI Status:** sudo systemctl status flaskapp
 * **View Web Logs:** journalctl -u flaskapp -f
